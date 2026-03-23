@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Memory Illusion</title>
+  <meta name="description" content="I told my AI about my dog. Then I asked it to find me an apartment. None of them allowed dogs.">
+
+  
+<meta property="og:title" content="Memory Illusion">
+<meta property="og:description" content="I told my AI about my dog. Then I asked it to find me an apartment. None of them allowed dogs.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://rozaliev.com/blog/2026/03/23/no-real-memory-systems/">
+<meta property="og:site_name" content="Evgeny Rozaliev">
+<meta name="twitter:card" content="summary">
+
+
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<span class="top-rule" aria-hidden="true"></span>
+
+<div class="page">
+  <nav>
+    <a href="/" class="nav-home">Evgeny Rozaliev</a>
+    <div class="nav-right">
+      <a href="/blog">blog</a>
+      
+      <span class="nav-ext">
+        <a href="https://github.com/rozaliev">github</a>
+        <a href="https://x.com/rozaliev">twitter</a>
+      </span>
+    </div>
+  </nav>
+
+  
+  <div class="post-header">
+    <a href="/blog" class="back">&larr; Back to all posts</a>
+    <h1>Memory Illusion</h1>
+    <div class="meta">
+      <span>March 23, 2026</span>
+      
+    </div>
+    
+    <div class="post-tags">
+      
+        <a href="/blog/tags/ai/" class="tag">ai</a>
+      
+        <a href="/blog/tags/memory/" class="tag">memory</a>
+      
+        <a href="/blog/tags/hard-reality/" class="tag">hard-reality</a>
+      
+    </div>
+    
+  </div>
+
+  <article class="article">
+    <p>Last year I decided to see if AI assistants could actually remember things. Not in the way a goldfish remembers things, which is apparently longer than we think, but in the way a human roommate remembers things, which is apparently shorter than we think.</p>
+<p>The test was simple. I told my AI assistant about my absolutely real, totally not bogus dog named Sashimi. I mentioned my dog many times. My dog appeared in conversations about my schedule, my notes, my shopping lists. If Big Brother was watching me, he would come away thinking "this man has a dog".</p>
+<p>Then I asked the assistant to find me an apartment.</p>
+<p>It returned twelve listings. Beautiful listings. Exposed brick, quiet neighborhoods. Well-presented and thoughtfully filtered. None of them allowed dogs.</p>
+<p>I sat there for a moment. See, after billions of dollars in investment, a Cambrian explosion of startups, your assistant still can't connect "has a dog" with "looking for an apartment". Your actual roommate, the one leaving passive-aggressive notes about the dishes, would not make this mistake.</p>
+<p>I've spent the better part of a year building a personal assistant, which is a thing you do when you're almost a middle-aged engineer who should probably just go for a walk. And "the dog problem" turned out to be a real pain in the ass, not a cute little edge case to sidestep.</p>
+<p>So I did what any reasonable person would do. I went looking for papers.</p>
+<h2>What "Memory" Means If You're a Computer</h2>
+<p>The papers are out there. There are companies. There are benchmarks. There are blog posts with charts. The charts go up and to the right. Everything is very professional.</p>
+<p>And when you peel it all back, here's what every memory system actually does:</p>
+<ol>
+<li>Pulls facts out of your conversations</li>
+<li>Stores them as vectors</li>
+<li>When you ask something, finds the vectors that look similar</li>
+<li>Shoves them into the prompt and prays</li>
+</ol>
+<p>If this sounds like a RAG, congratulations on your pattern recognition. It is just a RAG.</p>
+<p>Except RAG retrieves documents, which is comparatively easy, because when someone asks "what's our refund policy" there's probably a document describing the refund policy. By itself, RAG is fine. It works well for Serious Enterprise Companies.</p>
+<p>Memory is different. Memory is when you ask "find me an apartment" and the system remembers to take into account a fifty kilo mammal that eats shoes and stains carpets.</p>
+<p>Cosine similarity between "two bedroom apartment downtown" and "I have a Saint Bernard named Sashimi"? Approximately zero. Relevance? Absolute.</p>
+<p>Similarity is not relevance. This is the kind of thing that sounds obvious when you say it out loud and yet entire companies have been founded on the assumption that it isn't true.</p>
+<h2>Benchmarks Are Fine. The Benchmarks Are Always Fine.</h2>
+<p>Now, you'd think that after a few years of this, someone would have built a benchmark that actually tests whether memory systems can do, you know, memory things. You would be surprised.</p>
+<p><strong>Locomo</strong> gives the system short, clean, machine-generated conversations, ~16k tokens. That's maybe a slow Tuesday morning for a real assistant. And asks the system to recall facts from them. No contradictions over time, no cross-domain connections.</p>
+<p>They are to real human conversations what a store mannequin is to a person. The mannequin is wearing the right clothes and standing in the right place, but if you try to have dinner with it you will be disappointed.</p>
+<p><strong>HotPotQA</strong> is even better. It's 113,000 question-answer pairs pulled from the Wiki, where each question requires two paragraphs to answer. In a very dramatic turn of events, in 61% of the questions, only a single paragraph is enough. It also penalizes you for giving a correct answer with extra information. Maybe fun trivia for Saturday night, not the best memory test.</p>
+<p>And yet, these are the benchmarks memory systems compete on.</p>
+<h2>Meanwhile, in the Comments Section</h2>
+<p>Last year, two memory system companies, whose names, <code>Zep</code> and <code>Mem0</code>, sound to me like discarded villains from a cheap mecha anime, got into a public fight. Zep published results showing 84% accuracy on LoCoMo. Mem0 reran the test and said actually it was 58%. Zep fired back and said "actually actually", you can't benchmark properly, it's 75%.</p>
+<p>Buried in Zep's response, like a throwaway, was the gem. They admitted that the benchmark itself is basically theater for memory systems. They proposed to use a different benchmark (LongMemEval), which is better in the same way that getting punched in the gut is better than getting punched in the face.</p>
+<p>You can dive into their drama if you want to <a href="https://github.com/getzep/zep-papers/issues/5">here</a> and <a href="https://blog.getzep.com/lies-damn-lies-statistics-is-mem0-really-sota-in-agent-memory/">here</a>.</p>
+<p>Here's my favorite part that usually gets ignored: Mem0 showed in their own benchmarks that their own system and Zep's get outperformed by just dumping the entire conversation into the context window. No memory system at all. Just "here's everything, go figure it out". And that did better.</p>
+<p>The naive approach beat the systems specifically engineered to be smarter than it.</p>
+<h2>The Six Hard Problems (That nobody benchmarks)</h2>
+<p>The hardest parts of memory aren't what these systems solve, and they aren't what the benchmarks test. I think about this a lot, probably too much, and here is what I've concluded: real memory, the kind that would make an AI assistant actually useful, would need to handle at least six things that no one is testing for.</p>
+<p><strong>The dog problem:</strong> "Find me an apartment" needs to connect to "I have a dog". These live in different galaxies in embedding space. To bridge them, the system has to reason about the query before searching. It would need to ask itself "What do I know about this person that might be relevant here?". Which is, if you think about it, just what a good human assistant does.</p>
+<p><strong>The shovel problem:</strong> You said your manager was awesome in September. In December you said that you wanted to bring a shovel to your next one-on-one. Is this the same manager? Did something change? Is the September memory now wrong, or is it a historical context? What if it's a different manager? Current systems handle this by not handling.</p>
+<p><strong>The vegetarian problem:</strong> Your blog says you're a proud vegetarian. Your DoorDash receipts say brisket. Both are true. Neither is wrong. A memory system needs to hold contradictions without resolving them, or at least know when to ask. This is, incidentally, also the hard part of being a person.</p>
+<p><strong>The taxonomy problem:</strong> Memory is not one thing. "Remember to buy milk" and "Remember to remind Bob to buy milk" are different perspectives. "Bob has a dog" is a fact. "Never share private information without permission" is a rule. "First check email, then update the tracker, then draft a summary" is a workflow. These are all "memories", but they have completely different lifecycles, authority levels and retrieval patterns. Dumping them all together is like putting your birth certificate, garlic powder, and a hamster into the same jar. You can do it. You shouldn't.</p>
+<p><strong>The learning problem:</strong> An agent that can't learn from its mistakes isn't an agent, but an overpriced parrot. Learning requires attribution, knowing why you believe something. "I should always double-check Bob's timezone" (because I got burned on it twice) is very different from "always double-check the timezone" (because Bob set the rule). If you can't distinguish between them, the agent will eventually decide the user's core rules are as revisable as its own hunches. Bye-bye your email archive.</p>
+<p><strong>The scale problem:</strong> A busy person generates ten to fifteen notes a day, has several work sessions, sends dozens of emails, and runs errands. Their AI assistant, if it's doing anything useful, generates its own trajectories on top of that. Within a month, you're looking at thousands of memory units. Within a year, tens of thousands. The benchmarks test on a few conversations. Nobody is testing at the scale where real systems have to work. It's like load-testing a bridge by letting an opossum walk across it.</p>
+<h2>The Deeper Problem, or: Why Smart People Haven't Fixed This</h2>
+<p>It's tempting to think this is just an engineering problem. Better embeddings, smarter retrieval, more compute. But there are what you might call physics problems underneath. Here I'm going to get slightly philosophical, so if you're here only for the jokes about anime villains, you can skip ahead.</p>
+<p><strong>The filtering paradox:</strong> the entire modern approach assumes you can decide what's relevant before you know what you need it for. You have too much data to fit in the context window, so you have to choose what goes in. But the act of choosing requires understanding the task, and understanding the task requires the data you haven't loaded yet.</p>
+<p>Every time you filter, you also lose negative signal. The absence of information is also information. "There is no mention of allergies" is relevant to a medical assistant. But you can't retrieve absence. You can only notice what's missing if you expect it to be there.</p>
+<p>Humans do it constantly. We have common sense. We walk into the situation with a mental model of what's normal and notice when things deviate. You look at an apartment listing and think "wait, what about the dog" because you expect the dog to be relevant. You have a background process running that flags missing information.</p>
+<p>LLMs don't expect anything. They look at the listing and describe furniture. They process what's in front of them and predict the next token. If the dog isn't in the context, the dog doesn't exist. There is no background process. There is no "hmm, something is amiss". There is only what's there.</p>
+<p><strong>Absence is only noticeable in the presence of expectation</strong>. I keep coming back to this sentence. I think it might be the most important sentence in this entire post.</p>
+<p><strong>Compounding errors:</strong> you can try to fix this with more agents. Have one figure out what might be relevant, another agent retrieve it, another synthesize it. This is the direction the field is going and I want to be precise about what it means: you are building a pipeline where each stage can introduce errors that compound downstream. If Agent A misses your bad knee and makes an inaccurate summary, then Agent B doesn't know about it and plans without it. Agent C doesn't account for it. And now the system confidently saves a new memory "user prefers walkup apartments". Next time the wrong answer will be reinforced.</p>
+<p>The longer the system runs, the more these errors compound. The errors don't cancel out. They accumulate. Every faulty decision gets encoded as a new memory that makes future decisions worse. After a few weeks, you've got a system that's very confident about things that are wrong, and it will fight you about them because it has "evidence".</p>
+<p>If you've ever asked a coding agent to build anything large enough, you've already seen this in action.</p>
+<h2>Where This Leaves Us</h2>
+<p>The AI industry has a word for what these systems provide, the word is "memory", and that word is wrong. What they provide is retrieval. Good retrieval, sometimes. Retrieval that works great when your question and your answer live in the same semantic neighborhood. Retrieval that falls apart the moment real life gets involved, because real life is messy and contradictory and requires judgment no retrieval system has.</p>
+<p>The next time someone tells you their AI has "persistent memory" or "learns from your conversations" ask them the dog question. Ask them what happens when you search for apartments. See if they know about Sashimi.</p>
+<p>I bet they won't.</p>
+
+  </article>
+
+  <div class="post-footer">
+    <a href="/blog" class="back">&larr; Back to all posts</a>
+    <span class="date">March 23, 2026</span>
+  </div>
+
+
+  <footer>
+    <div class="footer-left">
+      <span>&copy; 2026 Evgeny Rozaliev</span>
+    </div>
+    <div class="footer-right">
+    </div>
+  </footer>
+</div>
+
+
+<script data-goatcounter="https://erz.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+
+</body>
+</html>

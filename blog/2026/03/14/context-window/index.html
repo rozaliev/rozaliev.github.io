@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your coding agent is a probabilistic semantic compressor pretending to be a developer</title>
+  <meta name="description" content="Context windows degrade from the first token. Here&#x27;s what that means for every prompt you write and every agent you run.">
+
+  
+<meta property="og:title" content="Your coding agent is a probabilistic semantic compressor pretending to be a developer">
+<meta property="og:description" content="Context windows degrade from the first token. Here&#x27;s what that means for every prompt you write and every agent you run.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://rozaliev.com/blog/2026/03/14/context-window/">
+<meta property="og:site_name" content="Evgeny Rozaliev">
+<meta name="twitter:card" content="summary">
+
+
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<span class="top-rule" aria-hidden="true"></span>
+
+<div class="page">
+  <nav>
+    <a href="/" class="nav-home">Evgeny Rozaliev</a>
+    <div class="nav-right">
+      <a href="/blog">blog</a>
+      
+      <span class="nav-ext">
+        <a href="https://github.com/rozaliev">github</a>
+        <a href="https://x.com/rozaliev">twitter</a>
+      </span>
+    </div>
+  </nav>
+
+  
+  <div class="post-header">
+    <a href="/blog" class="back">&larr; Back to all posts</a>
+    <h1>Your coding agent is a probabilistic semantic compressor pretending to be a developer</h1>
+    <div class="meta">
+      <span>March 14, 2026</span>
+      
+    </div>
+    
+    <div class="post-tags">
+      
+        <a href="/blog/tags/ai/" class="tag">ai</a>
+      
+        <a href="/blog/tags/hard-reality/" class="tag">hard-reality</a>
+      
+    </div>
+    
+  </div>
+
+  <article class="article">
+    <p>Last week a friend messaged me: "I've uploaded a document to ChatGPT and asked it to do an analysis. It did good. Then I uploaded the next one and suddenly it forgot half of my instructions and spouted total nonsense". She'd hit 80% of the context window.</p>
+<p>I've had dozens of similar conversations over the last few months. A person starts using LLMs and at first everything is great: the code does what it's supposed to, the summaries are on point. But as days pass the ugly truth shows its face. The code works as long as the task is straightforward and concise. Otherwise, it's a minefield. Summaries that were great for a single document fail on two and lose important details.</p>
+<p>If you're using LLMs or agents, you experience this daily. The root cause is something well known but commonly misunderstood: the context window. On the surface it sounds like a size limit, the number of tokens a model can hold at once. But the context window isn't a container that holds your data intact until it overflows. It's a compression stage. Lossy from the first token.</p>
+<p>That makes every LLM a <em>probabilistic semantic compressor</em>, at least it's not "just a monoid in the category of endofunctors", thank god for that.</p>
+<p>It's probabilistic because every token choice depends on random and semi-random conditions, semantic because it operates on meaning, and a compressor because it always loses information.</p>
+<details class="aside-collapsible">
+<summary>LLM Basics (click here if you don't know how LLMs work)</summary>
+<div class="aside-collapsible-body">
+<p>Large Language Models are trained on massive amounts of text. During training they learn statistical patterns: what words tend to follow what other words, in what contexts, across billions of documents. The result is a compressed representation of language patterns.</p>
+<p>When you send a prompt, the model breaks your text into tokens. Tokens are not words. They're chunks of words. "serendipity" becomes <code>[ser][end][ip][ity]</code>. Each token gets converted into a vector, a list of numbers that represents its meaning in context.</p>
+<p>Generation works one token at a time. The model looks at all tokens so far (your prompt plus anything it already generated) and predicts the most likely next token. Then it appends that token and repeats. This is called autoregressive generation.</p>
+<p>The key word is "predicts." The model doesn't "know" the answer. It calculates a probability distribution over all possible next tokens and samples from it. Sometimes the most probable token is correct. Sometimes it isn't. This is why the same prompt can produce different outputs, and why LLMs can be confidently wrong.</p>
+<p>Everything else (chat, code generation, summarization, agents) is built on top of this token-by-token prediction loop.</p>
+</div>
+</details>
+<h2>Attention is all you need and you can't get enough of it</h2>
+<p>The paper "Attention is all you need" gave rise to modern LLMs. The idea is concrete: LLMs generate tokens one by one, and for every token they ask a question: <code>what other tokens are related to the current one?</code>. In the simplest case it helps distinguish "a bank" as a financial institution from "a river bank". In more complex cases it connects semantically similar entities across the entire prompt.</p>
+<p>Attention is a memory hog. For a frontier model, each token can consume over a megabyte of memory in attention state. A 128K context window means north of 100GB just for the prompt. This is what limits the context window: the number of tokens an LLM can hold at once.</p>
+<p>People are working on making this more efficient. Sometimes those optimizations trade off quality, but that's a different story.</p>
+<p>What matters for users: <em>the attention is finite</em>. A model can't match every token to every other token in practice. It's a computational nightmare.</p>
+<p>The consequence: <em>every single token in a prompt consumes attention</em>. You asked for <code>2+2</code>, but also included a bunch of random numbers? The model will likely fail, distracted by irrelevant content.</p>
+<p>The bigger the model, the less it fails on simple cases. But the failures become more subtle, harder to spot. Every irrelevant token affects overall performance.</p>
+<h2>Compression starts at token one</h2>
+<p>If distractors in the prompt were the only problem we might have an easier life. But no. Even if your prompt is 100% relevant, every token still consumes attention. As the prompt grows, a model attends less and less, and information gets lost: compressed or forgotten.</p>
+<p>Contrary to common belief, <em>the loss is immediate</em>. With the first tokens. It only grows with prompt size. Not after 50% of context, not after 20%. From the first tokens. By the time context reaches 70% the model is severely degraded. Popular evals like needle-in-the-haystack test idealized conditions of a single needle, not the dozens or hundreds that real prompts contain.</p>
+<h2>The compressor's two tradeoffs</h2>
+<p>Two tensions you can't escape.</p>
+<h3>More detail vs more noise</h3>
+<p>The model needs more details to answer your question better. At the same time, every word you add competes for attention and steers the model off the target. Every subtask of your main task is a distractor. The more the compressor has to "keep in mind" the worse it represents any single part.</p>
+<h3>All the data vs fidelity</h3>
+<p>You have a document where all the details of a system are described with great precision, but there's a tiny little catch: the document is enormous by LLM standards, bigger than the context window.</p>
+<p>You need all the details to build the system, but the model can't do the work because performance degrades long before the document is even processed. I would love to tell you there is good news, but alas, no. This is a fundamental problem at the intersection of LLM design, resource requirements, and information theory.</p>
+<p>The problem is not lack of intelligence. Even with the best intelligence you have to compress the document to feed the LLM. But you can't know what to compress until you've understood the whole thing.</p>
+<h2>Your coding agent is a compressor in a trench coat</h2>
+<p>Here's how Claude Code, Codex and OpenCode work:</p>
+<ul>
+<li>Start a main agent</li>
+<li>Preload skill descriptions, general context, MCP servers</li>
+<li>The main agent does all the work, with an option of spawning subagents</li>
+<li>You're encouraged to treat the main agent as a capable entity and ask it to do complex tasks directly</li>
+<li>You're encouraged to save workflows as text in Skills</li>
+</ul>
+<p>Now consider a typical coding session. The system prompt eats 4-8K tokens. Skill descriptions and MCP definitions add another 2-5K. Project context (your CLAUDE.md, file trees, conventions): 3-8K more. That's 10-20K tokens consumed before you type your first message. On a 200K context model, you've already spent 10% on overhead. And that is an extremely conservative figure.</p>
+<p>It's not even about percentages, seemingly innocent phrase from one of the Skill files can alter the trajectory of a session in a meaningful way. Sometimes it only takes a word to anchor a model to a specific mode.</p>
+<p>You write a message, the agent reads some files, generates code, reads test output. By your third interaction you're at 40-60%. By your fifth, the compressor is operating fully in the degraded zone, carrying the full weight of every file it read, every failed test, every correction you made. And the system prompt, the skills, the MCPs are still there, still consuming attention, now completely irrelevant to the function you're debugging.</p>
+<p>The fact that you call a "probabilistic semantic compressor" an "agent" doesn't change its nature.</p>
+<p>Every single thing in this design promotes errors and performance degradation. The context is always full of things irrelevant to the immediate task. Instead of code-defined steps you have an LLM keeping the workflow in the context window.</p>
+<p>The frontier models are improving, the error percentage dropped. Agents produce seemingly OK results for simple tasks. For non-trivial tasks reliability hasn't moved. It's just hidden behind tons and tons of slop, creating an illusion of robustness that disappears when you need precision.</p>
+<p>Building a proper coding agent is hard and much more expensive. The architecture has to be right, and you need to spawn a fresh agent for every subtask. That means you can't cache the prompt. Currently, agentic coders rely heavily on caches: they keep your conversation preprocessed for the duration of your session, saving a lot of money on inference. Without caches the economics become impossible to sustain. I believe this is <em>one</em> of the reasons why Anthropic fought against nonstandard harnesses recently.</p>
+<h2>Working with a compressor</h2>
+<p>Once you see the compressor, you can work with it instead of against it.</p>
+<p><strong>Treat every token as a cost.</strong> Each token in your context doesn't just take up space. It actively degrades the representation of everything else. That <code>AGENTS.md</code> that your harness generated with <code>/init</code> is competing with an actual task at hand. Cut what isn't pulling its weight.</p>
+<p><strong>Know your compression ratio.</strong> A 200K context window doesn't give you 200K tokens of usable capacity. Depending on your task you may start seeing quality drops as early as 10%. It falls off a cliff past 70%. Your real token budget is much smaller.</p>
+<p><strong>Reset the compressor.</strong> The worst thing you can do is continue a long conversation hoping the model "remembers." It doesn't remember. It drags compressed residue of every previous exchange through attention. Start fresh.</p>
+<p><strong>Let code do bookkeeping.</strong> Every time you ask a model to "keep track" of something across steps, you're asking to preserve a specific piece of information while processing everything else around it. That's exactly what lossy compression drops first. Use code for tracking state, for iteration, for validation. Write intermediate results to files. The model should think, not manage.</p>
+<p><strong>Don't ask a model to do what code can solve.</strong> File operations, string manipulation, data transformation: use deterministic solutions. Running them through an LLM introduces error probability for zero benefit. A script that parses JSON gets it right every time. Running the same operation through an LLM gets it right most of the time, and "most of the time" compounds across steps.</p>
+<p><strong>Build pipelines, not generic executors.</strong> A pipeline knows its steps: read spec, generate code, run tests, check output. Each step has a small targeted input and specific output. A generic executor keeps everything in one ballooning context window and hopes for the best.</p>
+<p><strong>What can be deterministic must be deterministic.</strong> That's my favorite approach. Just don't put an LLM in unless you really need reasoning. For any work that demands reliability there is no other way.</p>
+<h2>The hype and the reality</h2>
+<p>I don't want to discourage anyone from using these tools. But in the hype economy we should understand the difference between a story and harsh reality.</p>
+<p>My friend's ChatGPT didn't forget her instructions because it was stupid. It forgot because every token from the first document was still sitting in the attention window, competing for the model's focus. The instructions lost the competition. The compressor compressed them away.</p>
+<p>That's the mechanism, whether you're uploading documents to ChatGPT or running a coding agent on a 50-file codebase.</p>
+<p>Seeing the compressor won't fix the fundamental tradeoffs. But it changes the questions you ask. When the model produces garbage, you can trace what it was forced to compress. That's a question with an answer, and the answer tells you what to fix.</p>
+<h2>P.S. Attention eval</h2>
+<p>Want to see the degradation with your own eyes? I built <a href="https://github.com/rozaliev/attention-eval">attention-eval</a> project. It runs a battery of tests against any LLM and shows you where attention falls off. Fair warning: it does a lot of requests and will cost you money. But seeing the curve for your specific model is worth it.</p>
+
+  </article>
+
+  <div class="post-footer">
+    <a href="/blog" class="back">&larr; Back to all posts</a>
+    <span class="date">March 14, 2026</span>
+  </div>
+
+
+  <footer>
+    <div class="footer-left">
+      <span>&copy; 2026 Evgeny Rozaliev</span>
+    </div>
+    <div class="footer-right">
+    </div>
+  </footer>
+</div>
+
+
+<script data-goatcounter="https://erz.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+
+</body>
+</html>
